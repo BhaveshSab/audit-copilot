@@ -1,0 +1,1009 @@
+diff --git a/backend/prisma/schema.prisma b/backend/prisma/schema.prisma
+index 6402455..926754b 100644
+--- a/backend/prisma/schema.prisma
++++ b/backend/prisma/schema.prisma
+@@ -582,3 +582,22 @@ model AssetImport {
+   @@index([status, leaseUntil])
+   @@index([ownerId, createdAt])
+ }
++
++// A separate receipt makes human copilot decisions retryable without duplicate
++// writes/activity rows. No credentials or raw LLM transcripts are stored here.
++model CopilotDecision {
++  id             String   @id @default(cuid())
++  actorId        String
++  idempotencyKey String
++  requestHash    String
++  auditCycleId   String
++  auditItemId    String
++  result         AuditResult
++  notes          String
++  evidenceRefs   Json
++  policyRefs     Json
++  createdAt      DateTime @default(now())
++
++  @@unique([actorId, idempotencyKey])
++  @@index([auditCycleId, auditItemId])
++}
+diff --git a/backend/src/audits/audits.controller.ts b/backend/src/audits/audits.controller.ts
+index b7cafd8..7acf1da 100644
+--- a/backend/src/audits/audits.controller.ts
++++ b/backend/src/audits/audits.controller.ts
+@@ -20,6 +20,7 @@ import { LookupAssetDto } from '../assets/dto/lookup-asset.dto';
+ import { AuditsService } from './audits.service';
+ import { AssignAuditorsDto } from './dto/assign-auditors.dto';
+ import { CreateAuditDto } from './dto/create-audit.dto';
++import { CopilotDecisionDto } from './dto/copilot-decision.dto';
+ import { MarkAuditItemDto } from './dto/mark-audit-item.dto';
+ import { QueryAuditItemsDto, QueryAuditsDto } from './dto/query-audits.dto';
+ 
+@@ -105,6 +106,19 @@ export class AuditsController {
+     return this.audits.markItem(user, id, itemId, dto);
+   }
+ 
++  /** Separate explicit human approval path; never called by a read-only agent. */
++  @Post(':id/items/:itemId/copilot-decisions')
++  @HttpCode(200)
++  @Roles(Role.ADMIN, Role.ASSET_MANAGER)
++  copilotDecision(
++    @CurrentUser() user: AuthUser,
++    @Param('id') id: string,
++    @Param('itemId') itemId: string,
++    @Body() dto: CopilotDecisionDto,
++  ) {
++    return this.audits.applyCopilotDecision(user, id, itemId, dto);
++  }
++
+   /** Auto discrepancy report: all MISSING / DAMAGED items with asset info. */
+   @Get(':id/discrepancies')
+   @Roles(Role.ADMIN, Role.ASSET_MANAGER, Role.DEPARTMENT_HEAD)
+diff --git a/backend/src/audits/audits.service.ts b/backend/src/audits/audits.service.ts
+index 7764b38..cd47e5d 100644
+--- a/backend/src/audits/audits.service.ts
++++ b/backend/src/audits/audits.service.ts
+@@ -1,3 +1,4 @@
++import { createHash } from 'node:crypto';
+ import {
+   BadRequestException,
+   ConflictException,
+@@ -21,6 +22,7 @@ import { NotificationsService } from '../notifications/notifications.service';
+ import { PrismaService } from '../prisma/prisma.service';
+ import { AssignAuditorsDto } from './dto/assign-auditors.dto';
+ import { CreateAuditDto } from './dto/create-audit.dto';
++import { CopilotDecisionDto } from './dto/copilot-decision.dto';
+ import { MarkAuditItemDto } from './dto/mark-audit-item.dto';
+ 
+ /** Public-safe user selection — never leaks passwordHash. */
+@@ -393,6 +395,133 @@ export class AuditsService {
+     return updated;
+   }
+ 
++  /** Atomically check freshness, mark, write provenance and record a receipt.
++   * An ambiguous network response can be retried with the SAME key/body.
++   * Replays reauthorize the caller but do not repeat writes or activity logs.
++   */
++  async applyCopilotDecision(
++    user: AuthUser,
++    id: string,
++    itemId: string,
++    dto: CopilotDecisionDto,
++  ) {
++    if (!this.isManager(user))
++      throw new ForbiddenException('Manager access required');
++    if (
++      dto.result !== AuditResult.VERIFIED &&
++      dto.result !== AuditResult.MISSING &&
++      dto.result !== AuditResult.DAMAGED
++    ) {
++      throw new BadRequestException('Invalid audit result');
++    }
++    const requestHash = createHash('sha256')
++      .update(
++        JSON.stringify({
++          id,
++          itemId,
++          expectedUpdatedAt: dto.expectedUpdatedAt,
++          result: dto.result,
++          notes: dto.notes,
++          evidenceRefs: dto.evidenceRefs,
++          policyRefs: dto.policyRefs,
++        }),
++      )
++      .digest('hex');
++    return this.prisma.$transaction(async (tx) => {
++      // Serialize both this path and ordinary marks/close on the cycle row.
++      await tx.$queryRaw`SELECT id FROM "AuditCycle" WHERE id=${id} FOR UPDATE`;
++      // Also serialize reuse of a key across DIFFERENT cycles.
++      await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${user.id + ':' + dto.idempotencyKey}, 0))`;
++      const receipt = await tx.copilotDecision.findUnique({
++        where: {
++          actorId_idempotencyKey: {
++            actorId: user.id,
++            idempotencyKey: dto.idempotencyKey,
++          },
++        },
++      });
++      if (receipt) {
++        if (receipt.requestHash !== requestHash)
++          throw new ConflictException(
++            'Idempotency key reused with different input',
++          );
++        return receipt;
++      }
++      const cycle = await tx.auditCycle.findUnique({ where: { id } });
++      if (!cycle) throw new NotFoundException('Audit cycle not found');
++      if (cycle.status !== AuditCycleStatus.OPEN)
++        throw new ConflictException('Audit cycle is closed');
++      const item = await tx.auditItem.findUnique({
++        where: { id: itemId },
++        include: { asset: { select: ASSET_SELECT } },
++      });
++      if (!item || item.auditCycleId !== id)
++        throw new NotFoundException('Audit item not found');
++      if (
++        item.updatedAt.toISOString() !==
++        new Date(dto.expectedUpdatedAt).toISOString()
++      ) {
++        throw new ConflictException(
++          'Audit item changed; reinvestigate before approval',
++        );
++      }
++      await tx.auditItem.update({
++        where: { id: itemId },
++        data: {
++          result: dto.result,
++          notes: dto.notes,
++          auditedById: user.id,
++          auditedAt: new Date(),
++        },
++      });
++      const decision = await tx.copilotDecision.create({
++        data: {
++          actorId: user.id,
++          idempotencyKey: dto.idempotencyKey,
++          requestHash,
++          auditCycleId: id,
++          auditItemId: itemId,
++          result: dto.result,
++          notes: dto.notes,
++          evidenceRefs: dto.evidenceRefs,
++          policyRefs: dto.policyRefs,
++        },
++      });
++      await this.activity.log(
++        {
++          actorId: user.id,
++          action: 'audit.copilot_decision_applied',
++          entityType: 'AuditItem',
++          entityId: itemId,
++          metadata: {
++            auditCycleId: id,
++            decisionId: decision.id,
++            result: dto.result,
++            evidenceRefs: dto.evidenceRefs,
++            policyRefs: dto.policyRefs,
++          },
++        },
++        tx,
++      );
++      if (
++        dto.result === AuditResult.MISSING ||
++        dto.result === AuditResult.DAMAGED
++      ) {
++        await this.notifications.notifyAuditDiscrepancy(
++          {
++            assetId: item.assetId,
++            label: `${item.asset.name} (${item.asset.assetTag})`,
++            cycleName: cycle.name,
++            result: dto.result,
++            actorId: user.id,
++          },
++          tx,
++        );
++      }
++      return decision;
++    });
++  }
++
+   // -------------------------------------------------------------------------
+   // DISCREPANCY REPORT
+   // -------------------------------------------------------------------------
+diff --git a/backend/src/notifications/notifications.service.ts b/backend/src/notifications/notifications.service.ts
+index 1b5beae..ebe17ee 100644
+--- a/backend/src/notifications/notifications.service.ts
++++ b/backend/src/notifications/notifications.service.ts
+@@ -150,14 +150,17 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
+    * member existed, but nothing ever produced it, so a discrepancy was only
+    * visible to whoever happened to open the report.
+    */
+-  async notifyAuditDiscrepancy(params: {
+-    assetId: string;
+-    label: string;
+-    cycleName: string;
+-    result: string;
+-    actorId: string;
+-  }): Promise<number> {
+-    const recipients = await this.prisma.user.findMany({
++  async notifyAuditDiscrepancy(
++    params: {
++      assetId: string;
++      label: string;
++      cycleName: string;
++      result: string;
++      actorId: string;
++    },
++    client: PrismaService | Prisma.TransactionClient = this.prisma,
++  ): Promise<number> {
++    const recipients = await client.user.findMany({
+       where: {
+         status: 'ACTIVE',
+         role: { in: [Role.ADMIN, Role.ASSET_MANAGER] },
+@@ -167,13 +170,16 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
+     });
+ 
+     for (const recipient of recipients) {
+-      await this.notify({
+-        userId: recipient.id,
+-        type: NotificationType.AUDIT_DISCREPANCY,
+-        message: `${params.label} was marked ${params.result} in the audit "${params.cycleName}".`,
+-        relatedEntityType: 'Asset',
+-        relatedEntityId: params.assetId,
+-      });
++      await this.notify(
++        {
++          userId: recipient.id,
++          type: NotificationType.AUDIT_DISCREPANCY,
++          message: `${params.label} was marked ${params.result} in the audit "${params.cycleName}".`,
++          relatedEntityType: 'Asset',
++          relatedEntityId: params.assetId,
++        },
++        client,
++      );
+     }
+ 
+     return recipients.length;
+diff --git a/backend/test/utils/test-app.ts b/backend/test/utils/test-app.ts
+index 4eabfd3..f2609dc 100644
+--- a/backend/test/utils/test-app.ts
++++ b/backend/test/utils/test-app.ts
+@@ -67,7 +67,7 @@ export async function createTestApp(
+ export async function resetDatabase(app: INestApplication) {
+   const prisma = app.get(PrismaService);
+   await prisma.$executeRawUnsafe(
+-    'TRUNCATE TABLE "JobOutbox", "AssetTagCounter", "PasswordResetToken", "Notification", "ActivityLog", "AuditItem", "AuditAssignment", "AuditCycle", "MaintenanceRequest", "Booking", "TransferRequest", "Allocation", "Asset", "AssetCategory", "Department", "User" CASCADE',
++    'TRUNCATE TABLE "CopilotDecision", "JobOutbox", "AssetTagCounter", "PasswordResetToken", "Notification", "ActivityLog", "AuditItem", "AuditAssignment", "AuditCycle", "MaintenanceRequest", "Booking", "TransferRequest", "Allocation", "Asset", "AssetCategory", "Department", "User" CASCADE',
+   );
+ 
+   // The asset-tag counter is durable state (that is the point of it: deleting
+diff --git a/src/components/dashboard/AuditCycleModal.tsx b/src/components/dashboard/AuditCycleModal.tsx
+index c8b9dd8..da8bf9d 100644
+--- a/src/components/dashboard/AuditCycleModal.tsx
++++ b/src/components/dashboard/AuditCycleModal.tsx
+@@ -25,6 +25,8 @@ import {
+ } from "lucide-react";
+ 
+ import AssetScanner from "./AssetScanner";
++import AuditCopilotPanel from "./AuditCopilotPanel";
++import { getSession } from "@/lib/session";
+ import { apiGet, apiSend } from "@/lib/api";
+ import { errorMessage } from "@/lib/utils";
+ 
+@@ -252,6 +254,10 @@ export default function AuditCycleModal({
+                     </p>
+                   )}
+ 
++                  {!readOnly && import.meta.env.VITE_COPILOT_ENABLED === "true" &&
++                    ["ADMIN", "ASSET_MANAGER"].includes(getSession()?.user.role ?? "") && (
++                      <AuditCopilotPanel cycleId={cycleId} itemId={item.id} onApplied={() => { void load(); onChanged?.(); }} />
++                    )}
+                   {!readOnly && (
+                     <div className="mt-2 flex flex-wrap gap-1.5">
+                       {MARKS.map((result) => (
+diff --git a/src/vite-env.d.ts b/src/vite-env.d.ts
+index ea78fa4..bf53689 100644
+--- a/src/vite-env.d.ts
++++ b/src/vite-env.d.ts
+@@ -3,6 +3,8 @@
+ interface ImportMetaEnv {
+   /** Base URL of the AssetFlow API, including the /api prefix. */
+   readonly VITE_API_BASE_URL?: string;
++  /** Explicit opt-in; requires a same-origin /copilot-api reverse proxy. */
++  readonly VITE_COPILOT_ENABLED?: string;
+ }
+ 
+ interface ImportMeta {
+diff --git a/vite.config.ts b/vite.config.ts
+index 93fba04..52507a2 100644
+--- a/vite.config.ts
++++ b/vite.config.ts
+@@ -10,6 +10,12 @@ export default defineConfig({
+     // unknown Host header — a DNS-rebinding guard).
+     host: true,
+     allowedHosts: [".e2b.app", ".vercel.app", "localhost"],
++    proxy: {
++      "/copilot-api": {
++        target: "http://127.0.0.1:8000",
++        rewrite: (url) => url.replace(/^\/copilot-api/, ""),
++      },
++    },
+   },
+   resolve: {
+     alias: {
+diff --git a/backend/prisma/migrations/20261022000000_copilot_decisions/migration.sql b/backend/prisma/migrations/20261022000000_copilot_decisions/migration.sql
+new file mode 100644
+index 0000000..ab65905
+--- /dev/null
++++ b/backend/prisma/migrations/20261022000000_copilot_decisions/migration.sql
+@@ -0,0 +1,16 @@
++CREATE TABLE "CopilotDecision" (
++    "id" TEXT NOT NULL,
++    "actorId" TEXT NOT NULL,
++    "idempotencyKey" TEXT NOT NULL,
++    "requestHash" TEXT NOT NULL,
++    "auditCycleId" TEXT NOT NULL,
++    "auditItemId" TEXT NOT NULL,
++    "result" "AuditResult" NOT NULL,
++    "notes" TEXT NOT NULL,
++    "evidenceRefs" JSONB NOT NULL,
++    "policyRefs" JSONB NOT NULL,
++    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
++    CONSTRAINT "CopilotDecision_pkey" PRIMARY KEY ("id")
++);
++CREATE UNIQUE INDEX "CopilotDecision_actorId_idempotencyKey_key" ON "CopilotDecision"("actorId", "idempotencyKey");
++CREATE INDEX "CopilotDecision_auditCycleId_auditItemId_idx" ON "CopilotDecision"("auditCycleId", "auditItemId");
+diff --git a/backend/src/audits/dto/copilot-decision.dto.ts b/backend/src/audits/dto/copilot-decision.dto.ts
+new file mode 100644
+index 0000000..5b32e78
+--- /dev/null
++++ b/backend/src/audits/dto/copilot-decision.dto.ts
+@@ -0,0 +1,43 @@
++import { AuditResult } from '@prisma/client';
++import {
++  ArrayMaxSize,
++  ArrayNotEmpty,
++  IsArray,
++  IsDateString,
++  IsIn,
++  IsString,
++  IsUUID,
++  MaxLength,
++  Matches,
++} from 'class-validator';
++
++/** Human-confirmed proposal only. The copilot has no privileged service token. */
++export class CopilotDecisionDto {
++  @IsUUID('4')
++  idempotencyKey: string;
++
++  @IsDateString()
++  expectedUpdatedAt: string;
++
++  @IsIn([AuditResult.VERIFIED, AuditResult.MISSING, AuditResult.DAMAGED])
++  result: AuditResult;
++
++  @IsString()
++  @MaxLength(4000)
++  @Matches(/\S/)
++  notes: string;
++
++  @IsArray()
++  @ArrayNotEmpty()
++  @ArrayMaxSize(24)
++  @IsString({ each: true })
++  @MaxLength(100, { each: true })
++  evidenceRefs: string[];
++
++  @IsArray()
++  @ArrayNotEmpty()
++  @ArrayMaxSize(8)
++  @IsString({ each: true })
++  @MaxLength(100, { each: true })
++  policyRefs: string[];
++}
+diff --git a/backend/test/copilot.e2e-spec.ts b/backend/test/copilot.e2e-spec.ts
+new file mode 100644
+index 0000000..0756201
+--- /dev/null
++++ b/backend/test/copilot.e2e-spec.ts
+@@ -0,0 +1,203 @@
++import { INestApplication } from '@nestjs/common';
++import { randomUUID } from 'node:crypto';
++import request from 'supertest';
++import {
++  auth,
++  createAsset,
++  createTestApp,
++  createUserWithToken,
++  resetDatabase,
++  seedFixtures,
++} from './utils/test-app';
++import { PrismaService } from '../src/prisma/prisma.service';
++import { ActivityService } from '../src/activity/activity.service';
++
++describe('Copilot human decision contract (real API + PostgreSQL)', () => {
++  let app: INestApplication;
++  let token: string;
++  let employee: string;
++  let cycle: string;
++  let item: { id: string; updatedAt: string };
++  let body: Record<string, unknown>;
++  const path = () => `/api/audits/${cycle}/items/${item.id}/copilot-decisions`;
++  beforeAll(async () => {
++    app = await createTestApp();
++  });
++  afterAll(async () => {
++    await app.close();
++  });
++  beforeEach(async () => {
++    await resetDatabase(app);
++    await app.get(PrismaService).copilotDecision.deleteMany();
++    const fixtures = await seedFixtures(app);
++    token = (
++      await createUserWithToken(app, {
++        name: 'Reviewer',
++        email: 'reviewer@demo.test',
++        role: 'ADMIN',
++      })
++    ).token;
++    employee = (
++      await createUserWithToken(app, {
++        name: 'Employee',
++        email: 'employee@demo.test',
++      })
++    ).token;
++    await createAsset(app, {
++      name: 'Laptop',
++      assetTag: 'AF-COPILOT',
++      categoryId: fixtures.electronics.id,
++    });
++    const created = await request(app.getHttpServer())
++      .post('/api/audits')
++      .set(auth(token))
++      .send({
++        name: 'Copilot review',
++        startDate: new Date().toISOString(),
++        endDate: new Date(Date.now() + 86400000).toISOString(),
++      })
++      .expect(201);
++    cycle = created.body.id;
++    item = (
++      await request(app.getHttpServer())
++        .get(`/api/audits/${cycle}/items`)
++        .set(auth(token))
++        .expect(200)
++    ).body.items[0];
++    body = {
++      idempotencyKey: randomUUID(),
++      expectedUpdatedAt: item.updatedAt,
++      result: 'MISSING',
++      notes: 'Human confirmed absence; investigate transfer.',
++      evidenceRefs: ['E1'],
++      policyRefs: ['AF-04.1'],
++    };
++  });
++  it('atomically writes mark, receipt and activity; exact retry does not repeat', async () => {
++    await createUserWithToken(app, {
++      name: 'Manager recipient',
++      email: 'manager@demo.test',
++      role: 'ASSET_MANAGER',
++    });
++    const first = await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send(body)
++      .expect(200);
++    const retry = await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send(body)
++      .expect(200);
++    expect(retry.body.id).toBe(first.body.id);
++    const db = app.get(PrismaService);
++    expect(await db.copilotDecision.count()).toBe(1);
++    expect(
++      await db.notification.count({ where: { type: 'AUDIT_DISCREPANCY' } }),
++    ).toBe(1);
++    expect(
++      await db.activityLog.count({
++        where: { action: 'audit.copilot_decision_applied' },
++      }),
++    ).toBe(1);
++    expect(
++      (await db.auditItem.findUniqueOrThrow({ where: { id: item.id } })).result,
++    ).toBe('MISSING');
++  });
++  it('rolls back mark and receipt when provenance recording fails', async () => {
++    const spy = jest
++      .spyOn(app.get(ActivityService), 'log')
++      .mockRejectedValueOnce(new Error('Synthetic activity failure'));
++    try {
++      await request(app.getHttpServer())
++        .post(path())
++        .set(auth(token))
++        .send(body)
++        .expect(500);
++      const db = app.get(PrismaService);
++      expect(await db.copilotDecision.count()).toBe(0);
++      expect(
++        (await db.auditItem.findUniqueOrThrow({ where: { id: item.id } }))
++          .result,
++      ).toBe('PENDING');
++    } finally {
++      spy.mockRestore();
++    }
++  });
++  it('rejects changed payload reuse of a receipt key', async () => {
++    await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send(body)
++      .expect(200);
++    await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send({ ...body, notes: 'different' })
++      .expect(409);
++  });
++  it('rejects stale proposals without a mark or receipt', async () => {
++    await request(app.getHttpServer())
++      .patch(`/api/audits/${cycle}/items/${item.id}`)
++      .set(auth(token))
++      .send({ result: 'VERIFIED' })
++      .expect(200);
++    await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send(body)
++      .expect(409);
++    expect(await app.get(PrismaService).copilotDecision.count()).toBe(0);
++  });
++  it('rejects closed cycles', async () => {
++    await request(app.getHttpServer())
++      .post(`/api/audits/${cycle}/close`)
++      .set(auth(token))
++      .expect(200);
++    await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send(body)
++      .expect(409);
++  });
++  it('rejects unauthorized, anonymous, invalid and cross-cycle requests', async () => {
++    await request(app.getHttpServer()).post(path()).send(body).expect(401);
++    await request(app.getHttpServer())
++      .post(path())
++      .set(auth(employee))
++      .send(body)
++      .expect(403);
++    await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send({ ...body, result: 'PENDING' })
++      .expect(400);
++    await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send({ ...body, evidenceRefs: [] })
++      .expect(400);
++    await request(app.getHttpServer())
++      .post(`/api/audits/${cycle}/items/not-in-cycle/copilot-decisions`)
++      .set(auth(token))
++      .send(body)
++      .expect(404);
++  });
++  it('replays an existing receipt after closing without mutating the cycle', async () => {
++    const first = await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send(body)
++      .expect(200);
++    await request(app.getHttpServer())
++      .post(`/api/audits/${cycle}/close`)
++      .set(auth(token))
++      .expect(200);
++    const retry = await request(app.getHttpServer())
++      .post(path())
++      .set(auth(token))
++      .send(body)
++      .expect(200);
++    expect(retry.body.id).toBe(first.body.id);
++  });
++});
+diff --git a/src/components/dashboard/AuditCopilotPanel.tsx b/src/components/dashboard/AuditCopilotPanel.tsx
+new file mode 100644
+index 0000000..41bbd22
+--- /dev/null
++++ b/src/components/dashboard/AuditCopilotPanel.tsx
+@@ -0,0 +1,145 @@
++import { useState } from "react";
++import { copilotRequest, type CopilotFinding } from "@/lib/copilot";
++
++/** Opt-in investigation and explicit human review; never runs on page load. */
++export default function AuditCopilotPanel({
++  cycleId,
++  itemId,
++  onApplied,
++}: {
++  cycleId: string;
++  itemId: string;
++  onApplied: () => void;
++}) {
++  const [finding, setFinding] = useState<CopilotFinding | null>(null);
++  const [busy, setBusy] = useState(false);
++  const [error, setError] = useState("");
++  const [note, setNote] = useState("");
++  async function perform(action: () => Promise<void>) {
++    setBusy(true);
++    setError("");
++    try {
++      await action();
++    } catch (e) {
++      setError(e instanceof Error ? e.message : "Copilot failed.");
++    } finally {
++      setBusy(false);
++    }
++  }
++  async function investigate() {
++    const row = await copilotRequest<CopilotFinding>("/api/investigations", {
++      cycle_id: cycleId,
++      item_id: itemId,
++      question:
++        "Investigate this recorded audit result using custody, transfer, maintenance, disposal and human-review policies. Do not infer physical presence from system status.",
++    });
++    setFinding(row);
++    setNote("");
++  }
++  async function review(action: "approve" | "reject") {
++    if (!finding) return;
++    const row = await copilotRequest<CopilotFinding>(
++      `/api/findings/${finding.id}/review`,
++      { action, note },
++    );
++    setFinding(row);
++    if (row.state === "APPLIED") onApplied();
++  }
++  const f = finding?.payload.finding;
++  return (
++    <section
++      aria-label="Audit Copilot"
++      className="mt-3 space-y-3 rounded-lg border border-line bg-surface p-3 text-xs text-ink"
++    >
++      <p>
++        Audit Copilot proposes; you verify and approve. Investigating may send
++        scoped evidence to the configured LLM provider and incur API costs.
++      </p>
++      <button
++        type="button"
++        disabled={busy}
++        onClick={() => void perform(investigate)}
++        className="rounded border border-line px-3 py-2 disabled:opacity-50"
++      >
++        {busy ? "Working…" : "Investigate with Copilot"}
++      </button>
++      {error && (
++        <p role="alert" className="text-danger">
++          {error}
++        </p>
++      )}
++      {finding && f && (
++        <>
++          <p>
++            <strong>{finding.state}</strong> · {finding.payload.mode} ·{" "}
++            {f.category}
++          </p>
++          <p>{f.cause}</p>
++          <p>Proposed mark: {f.result ?? "None — refused"}</p>
++          <p>{f.recommended_action}</p>
++          <p>
++            Self-reported confidence: {Math.round(f.confidence * 100)}%. Not
++            calibrated accuracy.
++          </p>
++          {finding.payload.evidence.map((e) => (
++            <details key={e.id}>
++              <summary>
++                {e.id}: {e.tool}
++              </summary>
++              <pre className="whitespace-pre-wrap break-words">
++                {JSON.stringify(e.data, null, 2)}
++              </pre>
++            </details>
++          ))}
++          {f.policy_refs.map((r, i) => (
++            <blockquote key={i} className="border-l-2 border-info pl-2">
++              <strong>{r.clause_id}</strong> — {r.quote}
++            </blockquote>
++          ))}
++          <p>
++            Check source relevance and physical observations. Valid citations do
++            not prove the conclusion. The bundled corpus is authored
++            demonstration policy.
++          </p>
++          <label className="block">
++            Human review note
++            <textarea
++              aria-label="Human review note"
++              maxLength={2000}
++              value={note}
++              onChange={(e) => setNote(e.target.value)}
++              className="mt-1 block w-full rounded border border-line bg-canvas p-2"
++            />
++          </label>
++          <div className="flex gap-2">
++            <button
++              type="button"
++              disabled={
++                busy ||
++                !note.trim() ||
++                f.refused ||
++                !["AWAITING_REVIEW", "APPLYING"].includes(finding.state)
++              }
++              onClick={() => void perform(() => review("approve"))}
++              className="rounded border border-line px-3 py-2 disabled:opacity-50"
++            >
++              {finding.state === "APPLYING"
++                ? "Retry same approval"
++                : "Approve and apply"}
++            </button>
++            <button
++              type="button"
++              disabled={
++                busy || !note.trim() || finding.state !== "AWAITING_REVIEW"
++              }
++              onClick={() => void perform(() => review("reject"))}
++              className="rounded border border-line px-3 py-2 disabled:opacity-50"
++            >
++              Reject proposal
++            </button>
++          </div>
++        </>
++      )}
++    </section>
++  );
++}
+diff --git a/src/components/dashboard/AuditCopilotPanel.spec.tsx b/src/components/dashboard/AuditCopilotPanel.spec.tsx
+new file mode 100644
+index 0000000..17f19ac
+--- /dev/null
++++ b/src/components/dashboard/AuditCopilotPanel.spec.tsx
+@@ -0,0 +1,125 @@
++import { afterEach, describe, expect, it, vi } from "vitest";
++import { fireEvent, render, screen, waitFor } from "@testing-library/react";
++import AuditCopilotPanel from "./AuditCopilotPanel";
++import { saveSession } from "@/lib/session";
++
++const finding = {
++  id: "proposal",
++  state: "AWAITING_REVIEW",
++  payload: {
++    mode: "fixture",
++    finding: {
++      category: "missing",
++      result: "MISSING",
++      cause: "Review custody",
++      confidence: 0.5,
++      recommended_action: "Ask custodian",
++      refused: false,
++      policy_refs: [{ clause_id: "AF-04.1", quote: "Human review required" }],
++    },
++    evidence: [{ id: "E1", tool: "get_asset", data: { status: "ALLOCATED" } }],
++  },
++};
++function login() {
++  saveSession({
++    token: "delegated",
++    user: {
++      id: "u",
++      name: "Reviewer",
++      email: "u@test.invalid",
++      role: "ADMIN",
++      status: "ACTIVE",
++      departmentId: null,
++    },
++  });
++}
++afterEach(() => {
++  vi.restoreAllMocks();
++  vi.unstubAllGlobals();
++});
++describe("Audit Copilot integration", () => {
++  it("does not investigate on render, sends a delegated JWT, and requires a human note", async () => {
++    login();
++    const fetchMock = vi
++      .fn()
++      .mockResolvedValue({ ok: true, json: async () => finding });
++    vi.stubGlobal("fetch", fetchMock);
++    const changed = vi.fn();
++    render(
++      <AuditCopilotPanel cycleId="cycle" itemId="item" onApplied={changed} />,
++    );
++    expect(fetchMock).not.toHaveBeenCalled();
++    fireEvent.click(screen.getByText("Investigate with Copilot"));
++    await screen.findByText("Review custody");
++    expect(fetchMock.mock.calls[0][0]).toBe("/copilot-api/api/investigations");
++    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe(
++      "Bearer delegated",
++    );
++    expect(screen.getByText("Approve and apply")).toBeDisabled();
++    fireEvent.change(screen.getByLabelText("Human review note"), {
++      target: { value: "Physical absence confirmed" },
++    });
++    fetchMock.mockResolvedValue({
++      ok: true,
++      json: async () => ({ ...finding, state: "APPLIED" }),
++    });
++    fireEvent.click(screen.getByText("Approve and apply"));
++    await waitFor(() => expect(changed).toHaveBeenCalledOnce());
++    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({
++      action: "approve",
++      note: "Physical absence confirmed",
++    });
++  });
++  it("never offers application for refused findings", async () => {
++    login();
++    vi.stubGlobal(
++      "fetch",
++      vi
++        .fn()
++        .mockResolvedValue({
++          ok: true,
++          json: async () => ({
++            ...finding,
++            state: "REFUSED",
++            payload: {
++              ...finding.payload,
++              finding: {
++                ...finding.payload.finding,
++                result: null,
++                refused: true,
++              },
++            },
++          }),
++        }),
++    );
++    render(
++      <AuditCopilotPanel cycleId="cycle" itemId="item" onApplied={() => {}} />,
++    );
++    fireEvent.click(screen.getByText("Investigate with Copilot"));
++    await screen.findByText("Review custody");
++    fireEvent.change(screen.getByLabelText("Human review note"), {
++      target: { value: "Try anyway" },
++    });
++    expect(screen.getByText("Approve and apply")).toBeDisabled();
++  });
++  it("shows service failures without reporting success", async () => {
++    login();
++    vi.stubGlobal(
++      "fetch",
++      vi
++        .fn()
++        .mockResolvedValue({
++          ok: false,
++          status: 409,
++          json: async () => ({ detail: "Evidence changed; reinvestigate" }),
++        }),
++    );
++    render(
++      <AuditCopilotPanel cycleId="cycle" itemId="item" onApplied={() => {}} />,
++    );
++    fireEvent.click(screen.getByText("Investigate with Copilot"));
++    expect(await screen.findByRole("alert")).toHaveTextContent(
++      "Evidence changed; reinvestigate",
++    );
++  });
++});
+diff --git a/src/lib/copilot.ts b/src/lib/copilot.ts
+new file mode 100644
+index 0000000..b46f4c6
+--- /dev/null
++++ b/src/lib/copilot.ts
+@@ -0,0 +1,51 @@
++import { getToken } from "@/lib/session";
++
++export interface CopilotFinding {
++  id: string;
++  state: string;
++  payload: {
++    mode: string;
++    finding: {
++      category: string;
++      result: string | null;
++      cause: string;
++      confidence: number;
++      recommended_action: string;
++      refused: boolean;
++      policy_refs: { clause_id: string; quote: string }[];
++    };
++    evidence: { id: string; tool: string; data: Record<string, unknown> }[];
++  };
++}
++
++/** Same-origin reverse proxy only: the user's JWT never goes to a URL from a model. */
++export async function copilotRequest<T>(
++  path: string,
++  body?: unknown,
++): Promise<T> {
++  const token = getToken();
++  if (!token) throw new Error("Sign in before using Audit Copilot.");
++  const controller = new AbortController();
++  const timer = setTimeout(() => controller.abort(), 100_000);
++  try {
++    const response = await fetch(`/copilot-api${path}`, {
++      method: body === undefined ? "GET" : "POST",
++      headers: {
++        Authorization: `Bearer ${token}`,
++        "Content-Type": "application/json",
++      },
++      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
++      signal: controller.signal,
++    });
++    const data = await response.json().catch(() => ({}));
++    if (!response.ok)
++      throw new Error(
++        typeof data.detail === "string"
++          ? data.detail
++          : `Copilot request failed (${response.status}).`,
++      );
++    return data as T;
++  } finally {
++    clearTimeout(timer);
++  }
++}
+diff --git a/.github/workflows/audit-copilot.yml b/.github/workflows/audit-copilot.yml
+new file mode 100644
+index 0000000..1581271
+--- /dev/null
++++ b/.github/workflows/audit-copilot.yml
+@@ -0,0 +1,53 @@
++name: Audit Copilot isolated acceptance
++on:
++  push:
++    paths: ['audit-copilot/**', 'backend/src/audits/**', 'backend/src/notifications/**', 'src/components/dashboard/Audit*', 'src/lib/copilot.ts', 'src/vite-env.d.ts', 'vite.config.ts', 'backend/prisma/**', 'backend/test/copilot.e2e-spec.ts', '.github/workflows/audit-copilot.yml']
++  pull_request:
++    paths: ['audit-copilot/**', 'backend/src/audits/**', 'backend/src/notifications/**', 'src/components/dashboard/Audit*', 'src/lib/copilot.ts', 'src/vite-env.d.ts', 'vite.config.ts', 'backend/prisma/**', 'backend/test/copilot.e2e-spec.ts', '.github/workflows/audit-copilot.yml']
++  workflow_dispatch:
++permissions:
++  contents: read
++jobs:
++  acceptance:
++    runs-on: ubuntu-latest
++    timeout-minutes: 15
++    env:
++      OTEL_SDK_DISABLED: 'true'
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-python@v5
++        with:
++          python-version: '3.11'
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22'
++      - name: Install locked Python dependencies
++        run: |
++          python -m pip install -r audit-copilot/requirements.lock
++          python -m pip install --no-deps -e audit-copilot
++      - name: Python safety and fixture tests (no paid API)
++        run: python -m pytest audit-copilot/tests -q
++      - name: Build review interface
++        run: npm ci --prefix audit-copilot/ui && npm run build --prefix audit-copilot/ui
++      - name: Test AssetFlow review integration
++        run: npm ci && npm run build && npm test -- --run src/components/dashboard/AuditCopilotPanel.spec.tsx
++      - name: Build actual AssetFlow integration
++        run: |
++          npm ci --prefix backend
++          npm run prisma:generate --prefix backend
++          npm run build --prefix backend
++          npm ci --prefix audit-copilot/integration
++      - name: Real API and PostgreSQL decision contract
++        run: npm run test:e2e --prefix backend -- --runInBand copilot.e2e-spec.ts --silent
++      - name: Real MCP, PostgreSQL FTS and pgvector acceptance (fixture LLM only)
++        env:
++          COPILOT_PYTHON: python
++        run: npm test --prefix audit-copilot/integration
++      - name: Fixture evaluation harness (NOT model-quality proof)
++        working-directory: audit-copilot
++        run: python -m audit_copilot.evaluate
++      - uses: actions/upload-artifact@v4
++        with:
++          name: copilot-synthetic-fixture-evaluation
++          path: audit-copilot/artifacts/evaluation.json
++          retention-days: 7

@@ -1,0 +1,482 @@
+[
+  {
+    "id": "query-01",
+    "question": "Review physical presence verified identity and allocation custody. What evidence is required?",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ]
+  },
+  {
+    "id": "query-02",
+    "question": "Investigate missing asset after approved transfer custody movement. What evidence is required?",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ]
+  },
+  {
+    "id": "query-03",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification. What evidence is required?",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ]
+  },
+  {
+    "id": "query-04",
+    "question": "Review disposed asset disposal record date and audit scope. What evidence is required?",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ]
+  },
+  {
+    "id": "query-05",
+    "question": "Investigate missing asset allocation return history and physical observation. What evidence is required?",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ]
+  },
+  {
+    "id": "query-06",
+    "question": "Review damaged condition maintenance referral and human approval. What evidence is required?",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ]
+  },
+  {
+    "id": "query-07",
+    "question": "Investigate suspected duplicate asset tag identity serial records. What evidence is required?",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ]
+  },
+  {
+    "id": "query-08",
+    "question": "Review physical presence verified identity and allocation custody. Which date checks apply?",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ]
+  },
+  {
+    "id": "query-09",
+    "question": "Investigate missing asset after approved transfer custody movement. Which date checks apply?",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ]
+  },
+  {
+    "id": "query-10",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification. Which date checks apply?",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ]
+  },
+  {
+    "id": "query-11",
+    "question": "Review disposed asset disposal record date and audit scope. Which date checks apply?",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ]
+  },
+  {
+    "id": "query-12",
+    "question": "Investigate missing asset allocation return history and physical observation. Which date checks apply?",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ]
+  },
+  {
+    "id": "query-13",
+    "question": "Review damaged condition maintenance referral and human approval. Which date checks apply?",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ]
+  },
+  {
+    "id": "query-14",
+    "question": "Investigate suspected duplicate asset tag identity serial records. Which date checks apply?",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ]
+  },
+  {
+    "id": "query-15",
+    "question": "Review physical presence verified identity and allocation custody. Who reviews this?",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ]
+  },
+  {
+    "id": "query-16",
+    "question": "Investigate missing asset after approved transfer custody movement. Who reviews this?",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ]
+  },
+  {
+    "id": "query-17",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification. Who reviews this?",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ]
+  },
+  {
+    "id": "query-18",
+    "question": "Review disposed asset disposal record date and audit scope. Who reviews this?",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ]
+  },
+  {
+    "id": "query-19",
+    "question": "Investigate missing asset allocation return history and physical observation. Who reviews this?",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ]
+  },
+  {
+    "id": "query-20",
+    "question": "Review damaged condition maintenance referral and human approval. Who reviews this?",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ]
+  },
+  {
+    "id": "query-21",
+    "question": "Investigate suspected duplicate asset tag identity serial records. Who reviews this?",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ]
+  },
+  {
+    "id": "query-22",
+    "question": "Review physical presence verified identity and allocation custody. What should be retained?",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ]
+  },
+  {
+    "id": "query-23",
+    "question": "Investigate missing asset after approved transfer custody movement. What should be retained?",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ]
+  },
+  {
+    "id": "query-24",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification. What should be retained?",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ]
+  },
+  {
+    "id": "query-25",
+    "question": "Review disposed asset disposal record date and audit scope. What should be retained?",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ]
+  },
+  {
+    "id": "query-26",
+    "question": "Investigate missing asset allocation return history and physical observation. What should be retained?",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ]
+  },
+  {
+    "id": "query-27",
+    "question": "Review damaged condition maintenance referral and human approval. What should be retained?",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ]
+  },
+  {
+    "id": "query-28",
+    "question": "Investigate suspected duplicate asset tag identity serial records. What should be retained?",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ]
+  },
+  {
+    "id": "query-29",
+    "question": "Review physical presence verified identity and allocation custody. When should we escalate?",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ]
+  },
+  {
+    "id": "query-30",
+    "question": "Investigate missing asset after approved transfer custody movement. When should we escalate?",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ]
+  },
+  {
+    "id": "query-31",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification. When should we escalate?",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ]
+  },
+  {
+    "id": "query-32",
+    "question": "Review disposed asset disposal record date and audit scope. When should we escalate?",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ]
+  },
+  {
+    "id": "query-33",
+    "question": "Investigate missing asset allocation return history and physical observation. When should we escalate?",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ]
+  },
+  {
+    "id": "query-34",
+    "question": "Review damaged condition maintenance referral and human approval. When should we escalate?",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ]
+  },
+  {
+    "id": "query-35",
+    "question": "Investigate suspected duplicate asset tag identity serial records. When should we escalate?",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ]
+  },
+  {
+    "id": "query-36",
+    "question": "Review physical presence verified identity and allocation custody. What is in scope?",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ]
+  },
+  {
+    "id": "query-37",
+    "question": "Investigate missing asset after approved transfer custody movement. What is in scope?",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ]
+  },
+  {
+    "id": "query-38",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification. What is in scope?",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ]
+  },
+  {
+    "id": "query-39",
+    "question": "Review disposed asset disposal record date and audit scope. What is in scope?",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ]
+  },
+  {
+    "id": "query-40",
+    "question": "Investigate missing asset allocation return history and physical observation. What is in scope?",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ]
+  }
+]

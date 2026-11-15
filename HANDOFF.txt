@@ -1,0 +1,16 @@
+Audit Copilot source and companion AssetFlow integration.
+
+1. audit-copilot-service/ contains the standalone service source, UI, tests,
+   corpus, evaluation harness, Docker/Compose definitions and standalone CI.
+   Transfer its CONTENTS to the requested empty audit-copilot repository using
+   a separate session attached to that repository. Nothing has been pushed.
+2. assetflow-integration.patch contains ONLY this implementation's AssetFlow
+   companion edits (API, migration, UI integration, tests and CI).
+   Patch base: e3b214055c58d14f7daec678dbcfa1393bef397e.
+   The remote branch may have advanced. Review against the actual target tree
+   and use git apply --check before applying. Do not reset/discard local work,
+   force-push, overwrite secrets, or migrate/deploy production automatically.
+3. Read audit-copilot-service/docs/VERIFICATION.md for executed checks and gaps.
+   Live LLM/semantic-embedding acceptance and model-quality metrics are pending.
+4. No virtual environments, bearer tokens, private .env, databases, generated UI
+   bundles or production secrets are included. The .env.example has placeholders.

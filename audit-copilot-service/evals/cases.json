@@ -1,0 +1,1458 @@
+[
+  {
+    "id": "case-01",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-01",
+        "assetId": "asset-01",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-01",
+        "assetTag": "AF-0001",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-1",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-02",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-02",
+        "assetId": "asset-02",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-02",
+        "assetTag": "AF-0002",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-2",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-03",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-03",
+        "assetId": "asset-03",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-03",
+        "assetTag": "AF-0003",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-3",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-04",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-04",
+        "assetId": "asset-04",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-04",
+        "assetTag": "AF-0004",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-4",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-05",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-05",
+        "assetId": "asset-05",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-05",
+        "assetTag": "AF-0005",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-5",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-06",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-06",
+        "assetId": "asset-06",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-06",
+        "assetTag": "AF-0006",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-6",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-07",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-07",
+        "assetId": "asset-07",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-07",
+        "assetTag": "AF-0007",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-7",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-08",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-08",
+        "assetId": "asset-08",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-08",
+        "assetTag": "AF-0008",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-8",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-09",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-09",
+        "assetId": "asset-09",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-09",
+        "assetTag": "AF-0009",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-9",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-10",
+    "category": "clean",
+    "question": "Review physical presence verified identity and allocation custody.",
+    "relevant": [
+      "AF-07.1",
+      "AF-07.2",
+      "AF-07.3",
+      "AF-07.4",
+      "AF-07.5",
+      "AF-07.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-10",
+        "assetId": "asset-10",
+        "result": "VERIFIED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Authorized physical observation recorded"
+      },
+      "get_asset": {
+        "id": "asset-10",
+        "assetTag": "AF-0010",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-10",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-11",
+    "category": "transferred",
+    "question": "Investigate missing asset after approved transfer custody movement.",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-11",
+        "assetId": "asset-11",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-11",
+        "assetTag": "AF-0011",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-11",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": [
+          {
+            "id": "transfer-11",
+            "status": "APPROVED"
+          }
+        ]
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-12",
+    "category": "transferred",
+    "question": "Investigate missing asset after approved transfer custody movement.",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-12",
+        "assetId": "asset-12",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-12",
+        "assetTag": "AF-0012",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-12",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": [
+          {
+            "id": "transfer-12",
+            "status": "APPROVED"
+          }
+        ]
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-13",
+    "category": "transferred",
+    "question": "Investigate missing asset after approved transfer custody movement.",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-13",
+        "assetId": "asset-13",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-13",
+        "assetTag": "AF-0013",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-13",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": [
+          {
+            "id": "transfer-13",
+            "status": "APPROVED"
+          }
+        ]
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-14",
+    "category": "transferred",
+    "question": "Investigate missing asset after approved transfer custody movement.",
+    "relevant": [
+      "AF-01.1",
+      "AF-01.2",
+      "AF-01.3",
+      "AF-01.4",
+      "AF-01.5",
+      "AF-01.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-14",
+        "assetId": "asset-14",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-14",
+        "assetTag": "AF-0014",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-14",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": [
+          {
+            "id": "transfer-14",
+            "status": "APPROVED"
+          }
+        ]
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-15",
+    "category": "maintenance",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification.",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-15",
+        "assetId": "asset-15",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-15",
+        "assetTag": "AF-0015",
+        "status": "UNDER_MAINTENANCE",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-15",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": [
+          {
+            "id": "maint-15",
+            "status": "IN_PROGRESS"
+          }
+        ]
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-16",
+    "category": "maintenance",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification.",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-16",
+        "assetId": "asset-16",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-16",
+        "assetTag": "AF-0016",
+        "status": "UNDER_MAINTENANCE",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-16",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": [
+          {
+            "id": "maint-16",
+            "status": "IN_PROGRESS"
+          }
+        ]
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-17",
+    "category": "maintenance",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification.",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-17",
+        "assetId": "asset-17",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-17",
+        "assetTag": "AF-0017",
+        "status": "UNDER_MAINTENANCE",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-17",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": [
+          {
+            "id": "maint-17",
+            "status": "IN_PROGRESS"
+          }
+        ]
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-18",
+    "category": "maintenance",
+    "question": "Investigate maintenance exception technician acknowledgement and physical verification.",
+    "relevant": [
+      "AF-02.1",
+      "AF-02.2",
+      "AF-02.3",
+      "AF-02.4",
+      "AF-02.5",
+      "AF-02.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-18",
+        "assetId": "asset-18",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-18",
+        "assetTag": "AF-0018",
+        "status": "UNDER_MAINTENANCE",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-18",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": [
+          {
+            "id": "maint-18",
+            "status": "IN_PROGRESS"
+          }
+        ]
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-19",
+    "category": "disposed",
+    "question": "Review disposed asset disposal record date and audit scope.",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-19",
+        "assetId": "asset-19",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-19",
+        "assetTag": "AF-0019",
+        "status": "DISPOSED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-19",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-20",
+    "category": "disposed",
+    "question": "Review disposed asset disposal record date and audit scope.",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-20",
+        "assetId": "asset-20",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-20",
+        "assetTag": "AF-0020",
+        "status": "DISPOSED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-20",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-21",
+    "category": "disposed",
+    "question": "Review disposed asset disposal record date and audit scope.",
+    "relevant": [
+      "AF-03.1",
+      "AF-03.2",
+      "AF-03.3",
+      "AF-03.4",
+      "AF-03.5",
+      "AF-03.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-21",
+        "assetId": "asset-21",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-21",
+        "assetTag": "AF-0021",
+        "status": "DISPOSED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-21",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-22",
+    "category": "missing",
+    "question": "Investigate missing asset allocation return history and physical observation.",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-22",
+        "assetId": "asset-22",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-22",
+        "assetTag": "AF-0022",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-22",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-23",
+    "category": "missing",
+    "question": "Investigate missing asset allocation return history and physical observation.",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-23",
+        "assetId": "asset-23",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-23",
+        "assetTag": "AF-0023",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-23",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-24",
+    "category": "missing",
+    "question": "Investigate missing asset allocation return history and physical observation.",
+    "relevant": [
+      "AF-04.1",
+      "AF-04.2",
+      "AF-04.3",
+      "AF-04.4",
+      "AF-04.5",
+      "AF-04.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-24",
+        "assetId": "asset-24",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-24",
+        "assetTag": "AF-0024",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-24",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-25",
+    "category": "damaged",
+    "question": "Review damaged condition maintenance referral and human approval.",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-25",
+        "assetId": "asset-25",
+        "result": "DAMAGED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-25",
+        "assetTag": "AF-0025",
+        "status": "ALLOCATED",
+        "condition": "DAMAGED"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-25",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": [
+          {
+            "id": "maint-25",
+            "status": "IN_PROGRESS"
+          }
+        ]
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-26",
+    "category": "damaged",
+    "question": "Review damaged condition maintenance referral and human approval.",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-26",
+        "assetId": "asset-26",
+        "result": "DAMAGED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-26",
+        "assetTag": "AF-0026",
+        "status": "ALLOCATED",
+        "condition": "DAMAGED"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-26",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": [
+          {
+            "id": "maint-26",
+            "status": "IN_PROGRESS"
+          }
+        ]
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-27",
+    "category": "damaged",
+    "question": "Review damaged condition maintenance referral and human approval.",
+    "relevant": [
+      "AF-05.1",
+      "AF-05.2",
+      "AF-05.3",
+      "AF-05.4",
+      "AF-05.5",
+      "AF-05.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-27",
+        "assetId": "asset-27",
+        "result": "DAMAGED",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-27",
+        "assetTag": "AF-0027",
+        "status": "ALLOCATED",
+        "condition": "DAMAGED"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-27",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": [
+          {
+            "id": "maint-27",
+            "status": "IN_PROGRESS"
+          }
+        ]
+      },
+      "get_activity": {
+        "items": []
+      }
+    }
+  },
+  {
+    "id": "case-28",
+    "category": "duplicate_tag",
+    "question": "Investigate suspected duplicate asset tag identity serial records.",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-28",
+        "assetId": "asset-28",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-28",
+        "assetTag": "AF-0028",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-28",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": [
+          {
+            "action": "asset.updated",
+            "entityType": "Asset",
+            "entityId": "asset-28",
+            "description": "Physical tag suspected duplicate; compare serials"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "case-29",
+    "category": "duplicate_tag",
+    "question": "Investigate suspected duplicate asset tag identity serial records.",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-29",
+        "assetId": "asset-29",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-29",
+        "assetTag": "AF-0029",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-29",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": [
+          {
+            "action": "asset.updated",
+            "entityType": "Asset",
+            "entityId": "asset-29",
+            "description": "Physical tag suspected duplicate; compare serials"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "case-30",
+    "category": "duplicate_tag",
+    "question": "Investigate suspected duplicate asset tag identity serial records.",
+    "relevant": [
+      "AF-06.1",
+      "AF-06.2",
+      "AF-06.3",
+      "AF-06.4",
+      "AF-06.5",
+      "AF-06.6"
+    ],
+    "records": {
+      "get_audit_item": {
+        "id": "case-30",
+        "assetId": "asset-30",
+        "result": "MISSING",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "notes": "Physical discrepancy requires investigation"
+      },
+      "get_asset": {
+        "id": "asset-30",
+        "assetTag": "AF-0030",
+        "status": "ALLOCATED",
+        "condition": "GOOD"
+      },
+      "get_allocation_history": {
+        "items": [
+          {
+            "id": "alloc-30",
+            "status": "ACTIVE",
+            "holderUserId": "synthetic-custodian"
+          }
+        ]
+      },
+      "get_transfers": {
+        "items": []
+      },
+      "get_maintenance_history": {
+        "items": []
+      },
+      "get_activity": {
+        "items": [
+          {
+            "action": "asset.updated",
+            "entityType": "Asset",
+            "entityId": "asset-30",
+            "description": "Physical tag suspected duplicate; compare serials"
+          }
+        ]
+      }
+    }
+  }
+]
